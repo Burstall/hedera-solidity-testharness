@@ -1,0 +1,21 @@
+{
+  "name": "test-framework",
+  "scripts": {
+    "test": "npx hardhat test",
+    "check-size": "npx hardhat check-size",
+    "solhint": "npx solhint -f table contracts/**/*.sol"
+  },
+  "dependencies": {
+    "@hashgraph/sdk": "^2.24.2",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@openzeppelin/contracts": "^4.8.3",
+    "axios": "^1.4.0",
+    "chai": "^4.3.7",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.40.0",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.14.0",
+    "solhint": "^3.4.1",
+    "web3": "^1.9.0"
+  }
+}
