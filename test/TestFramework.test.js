@@ -200,7 +200,6 @@ describe('Testing Allowances: ', function() {
 		// mirror nodes have a small delay
 		await sleep(2000);
 		const result = await checkMirrorAllowance(aliceId, FTTokenId, contractId);
-		console.log('Mirror node result:', result);
 		expect(result).to.be.equal(10);
 	});
 
@@ -220,7 +219,7 @@ describe('Testing Transfers: ', function() {
 	});
 
 	it('verify Recieve() via HTS send from mirror node', async function() {
-		await sleep(2000);
+		await sleep(5000);
 		await checkLastMirrorEvent();
 		// expect(result).to.be.equal(5);
 		expect(true).to.be.true;
@@ -233,7 +232,7 @@ describe('Testing Transfers: ', function() {
 	});
 
 	it('verify Fallback from mirror node', async function() {
-		await sleep(2000);
+		await sleep(5000);
 		await checkLastMirrorEvent();
 		// expect(result).to.be.equal(8);
 		expect(true).to.be.true;
@@ -447,7 +446,18 @@ async function checkApprovalFcn(_tokenId, _ownerId, _spenderId) {
 async function triggerFallback(_amt, hbarUnits = HbarUnit.Tinybar) {
 	try {
 		// calling a method that doesn't exist will trigger the fallback
-		await contractExecuteFcn(contractId, 200_000, 'randomMethodName', [], new Hbar(_amt, hbarUnits));
+		const encodedCommand = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('triggerFallback()'));
+
+		const contractExecuteTx = await new ContractExecuteTransaction()
+			.setContractId(contractId)
+			.setGas(100_000)
+			.setFunctionParameters(Buffer.from(encodedCommand.slice(2), 'hex'))
+			.setPayableAmount(new Hbar(_amt, hbarUnits))
+			.execute(client);
+
+		const contractExecuteRx = await contractExecuteTx.getReceipt(client);
+
+		return contractExecuteRx.status.toString();
 	}
 	catch (e) {
 		return e;
@@ -569,7 +579,7 @@ async function checkMirrorAllowance(_userId, _tokenId, _spenderId) {
 			jsonResponse.allowances.forEach(allowance => {
 				if (allowance.spender == _spenderId.toString()) {
 					console.log(' -Mirror Node: Found allowance for', allowance.owner, 'with allowance', allowance.amount_granted, 'of token', allowance.token_id);
-					rtnVal =  Number(allowance.amount_granted);
+					rtnVal = Number(allowance.amount_granted);
 				}
 			});
 		})
