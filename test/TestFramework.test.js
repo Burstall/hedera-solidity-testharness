@@ -220,7 +220,7 @@ describe('Testing Allowances: ', function() {
 });
 
 describe('Testing Transfers: ', function() {
-	it('Operator sends 5 tinybar to Contact', async function() {
+	it('Operator sends 5 tinybar to Contract', async function() {
 		client.setOperator(operatorId, operatorKey);
 		const result = await sendHbar(AccountId.fromSolidityAddress(contractAddress), operatorId, 5, HbarUnit.Tinybar);
 		expect(result).to.be.equal('SUCCESS');
