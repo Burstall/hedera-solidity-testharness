@@ -77,8 +77,13 @@ describe('Deployment: ', function() {
 			client = Client.forNetwork(node).setMirrorNetwork('127.0.0.1:5600');
 			console.log('testing in *LOCAL*');
 			baseUrl = 'http://localhost:5551';
-			operatorId = AccountId.fromString('0.0.2');
-			operatorKey = PrivateKey.fromString('302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137');
+			const rootId = AccountId.fromString('0.0.2');
+			const rootKey = PrivateKey.fromString('302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137');
+
+			// create an operator account on the local node and use this for testing as operator
+			client.setOperator(rootId, rootKey);
+			operatorKey = PrivateKey.generateED25519();
+			operatorId = await accountCreator(operatorKey, 1000);
 		}
 		else {
 			console.log('ERROR: Must specify either MAIN or TEST as environment in .env file');
@@ -562,10 +567,10 @@ function linkBytecode(bytecode, libNameArray, libAddressArray) {
  * @param {string | number} initialBalance initial balance in hbar
  * @returns {AccountId} the newly created Account ID object
  */
-async function accountCreator(privateKey, initialBalance) {
+async function accountCreator(privateKey, initialBalance, maxTokenAssociations = 0) {
 	const response = await new AccountCreateTransaction()
 		.setInitialBalance(new Hbar(initialBalance))
-		.setMaxAutomaticTokenAssociations(10)
+		.setMaxAutomaticTokenAssociations(maxTokenAssociations)
 		.setKey(privateKey.publicKey)
 		.execute(client);
 	const receipt = await response.getReceipt(client);
