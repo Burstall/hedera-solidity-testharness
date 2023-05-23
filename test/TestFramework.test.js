@@ -32,8 +32,8 @@ const { default: axios } = require('axios');
 require('dotenv').config();
 
 // Get operator from .env file
-const operatorKey = PrivateKey.fromString(process.env.PRIVATE_KEY);
-const operatorId = AccountId.fromString(process.env.ACCOUNT_ID);
+let operatorKey = PrivateKey.fromString(process.env.PRIVATE_KEY);
+let operatorId = AccountId.fromString(process.env.ACCOUNT_ID);
 const contractName = 'TestFramework';
 const env = process.env.ENVIRONMENT ?? null;
 
@@ -71,6 +71,14 @@ describe('Deployment: ', function() {
 			client = Client.forMainnet();
 			console.log('testing in *MAINNET*');
 			baseUrl = baseUrlForMainnet;
+		}
+		else if (env.toUpperCase() == 'LOCAL') {
+			const node = { '127.0.0.1:50211': new AccountId(3) };
+			client = Client.forNetwork(node).setMirrorNetwork('127.0.0.1:5600');
+			console.log('testing in *LOCAL*');
+			baseUrl = 'http://localhost:5551';
+			operatorId = AccountId.fromString('0.0.2');
+			operatorKey = PrivateKey.fromString('302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137');
 		}
 		else {
 			console.log('ERROR: Must specify either MAIN or TEST as environment in .env file');
@@ -244,6 +252,7 @@ describe('Testing Transfers: ', function() {
  * @param {AccountId} acct
  * @param {PrivateKey} key
  */
+// eslint-disable-next-line no-unused-vars
 async function mintFT(acct) {
 	const supplyKey = PrivateKey.generateED25519();
 	const tokenCreateTx = new TokenCreateTransaction()
@@ -438,8 +447,9 @@ async function contractDeployFcn(bytecode, gasLim) {
  * @returns {Number} allowance as a number
  */
 async function checkApprovalFcn(_tokenId, _ownerId, _spenderId) {
-	const [contractExecuteRx, contractResults] = await contractExecuteFcn(contractId, 200_000, 'checkAllowance',
+	const [contractExecuteRx, contractResults, record] = await contractExecuteFcn(contractId, 200_000, 'checkAllowance',
 		[_tokenId.toSolidityAddress(), _ownerId.toSolidityAddress(), _spenderId.toSolidityAddress()]);
+	console.log('Tx Id:', record.transactionId.toString());
 	return [contractExecuteRx.status.toString(), Number(contractResults[0])];
 }
 
