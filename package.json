@@ -2,11 +2,13 @@
   "name": "test-framework",
   "scripts": {
     "test": "npx hardhat test",
+	"test-factory": "npx hardhat test test/Factory.test.js",
+	"test-testframwork": "npx hardhat test test/TestFramework.test.js",
     "check-size": "npx hardhat check-size",
     "solhint": "npx solhint -f table contracts/**/*.sol"
   },
   "dependencies": {
-    "@hashgraph/sdk": "^2.24.2",
+    "@hashgraph/sdk": "^2.26.0-beta.2",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@openzeppelin/contracts": "^4.8.3",
     "axios": "^1.4.0",
