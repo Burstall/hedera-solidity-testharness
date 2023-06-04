@@ -3,7 +3,7 @@
   "scripts": {
     "test": "npx hardhat test",
 	"test-factory": "npx hardhat test test/Factory.test.js",
-	"test-testframwork": "npx hardhat test test/TestFramework.test.js",
+	"test-testframework": "npx hardhat test test/TestFramework.test.js",
     "check-size": "npx hardhat check-size",
     "solhint": "npx solhint -f table contracts/**/*.sol"
   },
