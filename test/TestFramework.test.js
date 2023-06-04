@@ -36,6 +36,7 @@ let operatorKey = PrivateKey.fromString(process.env.PRIVATE_KEY);
 let operatorId = AccountId.fromString(process.env.ACCOUNT_ID);
 const contractName = 'TestFramework';
 const env = process.env.ENVIRONMENT ?? null;
+const safeHTSDeployment = process.env.SAFE_HTS ?? null;
 
 const libraryNames = ['SafeHTS'];
 
@@ -99,6 +100,11 @@ describe('Deployment: ', function() {
 		const libraryDeployedIds = [];
 		for (let i = 0; i < libraryNames.length; i++) {
 			const libraryName = libraryNames[i];
+			if (libraryName == 'SafeHTS' && safeHTSDeployment) {
+				console.log('Skipping SafeHTS deployment as it is already deployed');
+				libraryDeployedIds.push(ContractId.fromString(safeHTSDeployment));
+				continue;
+			}
 			console.log('\n-Deploying library:', libraryName);
 
 			const libraryBytecode = JSON.parse(fs.readFileSync(`./artifacts/contracts/${libraryName}.sol/${libraryName}.json`)).bytecode;
@@ -452,9 +458,10 @@ async function contractDeployFcn(bytecode, gasLim) {
  * @returns {Number} allowance as a number
  */
 async function checkApprovalFcn(_tokenId, _ownerId, _spenderId) {
-	const [contractExecuteRx, contractResults, record] = await contractExecuteFcn(contractId, 200_000, 'checkAllowance',
+	const [contractExecuteRx, contractResults] = await contractExecuteFcn(contractId, 200_000, 'checkAllowance',
 		[_tokenId.toSolidityAddress(), _ownerId.toSolidityAddress(), _spenderId.toSolidityAddress()]);
-	console.log('Tx Id:', record.transactionId.toString());
+	// console.log('Tx Id:', record.transactionId.toString());
+	// console.log('allowance is ', contractResults);
 	return [contractExecuteRx.status.toString(), Number(contractResults[0])];
 }
 
