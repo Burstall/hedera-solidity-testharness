@@ -14,7 +14,7 @@ contract TestFramework is Ownable {
 		string _message
 	);
 	
-	function checkAllowance(address _token, address _owner, address _spender) public returns (uint256 allowance) {
+	function checkLiveAllowance(address _token, address _owner, address _spender) public returns (uint256 allowance) {
 		allowance = SafeHTS.safeAllowance(_token, _owner, _spender);
 	}
 
@@ -22,7 +22,7 @@ contract TestFramework is Ownable {
 		isApproved = SafeHTS.safeIsApprovedForAll(_token, _owner, _spender);
 	}
 
-	function checkAllowances(address[] memory _token, address[] memory _owner, address[] memory _spender) public returns (uint256[] memory allowances) {
+	function checkLiveAllowances(address[] memory _token, address[] memory _owner, address[] memory _spender) public returns (uint256[] memory allowances) {
 		require(_token.length == _owner.length && _owner.length == _spender.length, "Arrays must be of equal length");
 		allowances = new uint256[](_token.length);
 		for (uint256 i = 0; i < _token.length; i++) {
@@ -36,6 +36,14 @@ contract TestFramework is Ownable {
 		for (uint256 i = 0; i < _token.length; i++) {
 			approvals[i] = SafeHTS.safeIsApprovedForAll(_token[i], _owner[i], _spender[i]);
 		}
+	}
+
+	function useFTApproval(address _token, address _sender, uint256 _amount) external {
+		SafeHTS.safeTransferFrom(_token, _sender, address(this), _amount);
+	}
+
+	function batchAssociate(address[] memory _tokens) public {
+		SafeHTS.safeAssociateTokens(address(this), _tokens);
 	}
 
 	receive() external payable {

@@ -21,6 +21,7 @@ library SafeHTS {
     error TokensTransferFailed();
     error NFTsTransferFailed();
     error TokenTransferFailed();
+	error TokenTransferFromFailed();
     error NFTTransferFailed();
     error CreateFungibleTokenFailed();
     error CreateFungibleTokenWithCustomFeesFailed();
@@ -123,6 +124,16 @@ library SafeHTS {
             abi.encodeWithSelector(IHederaTokenService.transferTokens.selector,
             token, accountIds, amounts));
         if (!tryDecodeSuccessResponseCode(success, result)) revert TokensTransferFailed();
+    }
+
+	function safeTransferFrom(address _token, address _from, address _to, uint256 _amount) external {
+        (bool success, bytes memory result) = PRECOMPILE_ADDRESS.call(
+            abi.encodeWithSelector(IHederaTokenService.transferFrom.selector,
+                _token,
+                _from,
+                _to,
+                _amount));
+        if (!tryDecodeSuccessResponseCode(success, result)) revert TokenTransferFromFailed();
     }
 
     function safeTransferNFTs(address token, address[] memory sender, address[] memory receiver, int64[] memory serialNumber) external {

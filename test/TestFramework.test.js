@@ -172,6 +172,12 @@ describe('Deployment: ', function() {
 		result = await sendNFT([1, 2]);
 		expect(result).to.be.equal('SUCCESS');
 	});
+
+	it('Operator associates tokens to contract', async function() {
+		client.setOperator(operatorId, operatorKey);
+		const result = await associateTokensToContract([FTTokenId, NFTTokenId]);
+		expect(result).to.be.equal('SUCCESS');
+	});
 });
 
 describe('Testing Allowances: ', function() {
@@ -187,10 +193,14 @@ describe('Testing Allowances: ', function() {
 		expect(result).to.be.equal('SUCCESS');
 	});
 
+	// use the allowance
+
+	// check the allowance at contract via mirror nodes
+
 	it('Alice checks the FT approval at contract level', async function() {
 		client.setOperator(aliceId, alicePK);
 		const [status, allowance] = await checkApprovalFcn(FTTokenId, aliceId, contractId);
-		expect(allowance).to.be.equal(10);
+		expect(allowance).to.be.equal(8);
 		expect(status).to.be.equal('SUCCESS');
 	});
 
@@ -458,11 +468,27 @@ async function contractDeployFcn(bytecode, gasLim) {
  * @returns {Number} allowance as a number
  */
 async function checkApprovalFcn(_tokenId, _ownerId, _spenderId) {
-	const [contractExecuteRx, contractResults] = await contractExecuteFcn(contractId, 200_000, 'checkAllowance',
+	const [contractExecuteRx, contractResults] = await contractExecuteFcn(contractId, 200_000, 'checkLiveAllowance',
 		[_tokenId.toSolidityAddress(), _ownerId.toSolidityAddress(), _spenderId.toSolidityAddress()]);
 	// console.log('Tx Id:', record.transactionId.toString());
 	// console.log('allowance is ', contractResults);
 	return [contractExecuteRx.status.toString(), Number(contractResults[0])];
+}
+
+/**
+ * Helper method to batch associate tokens to the Contract [ does not envisage > 20 in one batch]
+ * @param {TokenId[]} _tokenIdArray the list of TokenIds to assopciate
+ * @returns {String} status of the transaction
+ */
+async function associateTokensToContract(_tokenIdArray) {
+	const solidityTokenArray = [];
+	for (let i = 0; i < _tokenIdArray.length; i++) {
+		solidityTokenArray.push(_tokenIdArray[i].toSolidityAddress());
+	}
+	const [contractExecuteRx] = await contractExecuteFcn(contractId, 950_000, 'batchAssociate',
+		[solidityTokenArray]);
+
+	return contractExecuteRx.status.toString();
 }
 
 async function triggerFallback(_amt, hbarUnits = HbarUnit.Tinybar) {
@@ -504,7 +530,7 @@ async function checkNFTApprovalFcn(_tokenId, _ownerId, _spenderId) {
  * @param {ContractId} cId the contract to call
  * @param {number | Long.Long} gasLim the max gas
  * @param {string} fcnName name of the function to call
- * @param {ContractFunctionParameters} params the function arguments
+ * @param {Object[]} params the function arguments
  * @param {string | number | Hbar | Long.Long | BigNumber} amountHbar the amount of hbar to send in the methos call
  * @returns {[TransactionReceipt, any, TransactionRecord]} the transaction receipt and any decoded results
  */
