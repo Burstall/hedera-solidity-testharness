@@ -117,7 +117,7 @@ describe('Deployment: ', function() {
 
 		// import ABI
 		abi = json.abi;
-		iface = new ethers.utils.Interface(abi);
+		iface = ethers.Interface.from(abi);
 
 		const contractBytecode = json.bytecode;
 
@@ -468,7 +468,7 @@ async function checkApprovalFcn(_tokenId, _ownerId, _spenderId) {
 async function triggerFallback(_amt, hbarUnits = HbarUnit.Tinybar) {
 	try {
 		// calling a method that doesn't exist will trigger the fallback
-		const encodedCommand = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('triggerFallback()'));
+		const encodedCommand = ethers.keccak256(ethers.toUtf8Bytes('triggerFallback()'));
 
 		const contractExecuteTx = await new ContractExecuteTransaction()
 			.setContractId(contractId)
@@ -552,7 +552,7 @@ function linkBytecode(bytecode, libNameArray, libAddressArray) {
 
 		const nameToHash = `contracts/${libName}.sol:${libName}`;
 
-		const placeholder = `__$${ethers.utils.solidityKeccak256(['string'], [nameToHash]).slice(2, 36)}$__`;
+		const placeholder = `__$${ethers.keccak256(ethers.toUtf8Bytes(nameToHash)).slice(2, 36)}$__`;
 		console.log('placeholder', placeholder);
 		// const formattedAddress = libAddress.toLowerCase().replace('0x', '');
 		console.log('libAddress', libAddress);

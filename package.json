@@ -2,22 +2,22 @@
   "name": "test-framework",
   "scripts": {
     "test": "npx hardhat test",
-	"test-factory": "npx hardhat test test/Factory.test.js",
-	"test-testframework": "npx hardhat test test/TestFramework.test.js",
+    "test-factory": "npx hardhat test test/Factory.test.js",
+    "test-testframework": "npx hardhat test test/TestFramework.test.js",
     "check-size": "npx hardhat check-size",
     "solhint": "npx solhint -f table contracts/**/*.sol"
   },
   "dependencies": {
     "@hashgraph/sdk": "^2.26.0-beta.2",
-    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "@openzeppelin/contracts": "^4.8.3",
     "axios": "^1.4.0",
     "chai": "^4.3.7",
     "dotenv": "^16.0.3",
     "eslint": "^8.40.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.7.0",
     "hardhat": "^2.14.0",
-    "solhint": "^3.4.1",
-    "web3": "^1.9.0"
+    "hardhat-contract-sizer": "^2.10.0",
+    "solhint": "^3.4.1"
   }
 }

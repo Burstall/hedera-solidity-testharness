@@ -22,6 +22,22 @@ contract TestFramework is Ownable {
 		isApproved = SafeHTS.safeIsApprovedForAll(_token, _owner, _spender);
 	}
 
+	function checkAllowances(address[] memory _token, address[] memory _owner, address[] memory _spender) public returns (uint256[] memory allowances) {
+		require(_token.length == _owner.length && _owner.length == _spender.length, "Arrays must be of equal length");
+		allowances = new uint256[](_token.length);
+		for (uint256 i = 0; i < _token.length; i++) {
+			allowances[i] = SafeHTS.safeAllowance(_token[i], _owner[i], _spender[i]);
+		}
+	}
+	
+	function checkTokensApprovedForAllSerial(address[] memory _token, address[] memory _owner, address[] memory _spender) public returns (bool[] memory approvals) {
+		require(_token.length == _owner.length && _owner.length == _spender.length, "Arrays must be of equal length");
+		approvals = new bool[](_token.length);
+		for (uint256 i = 0; i < _token.length; i++) {
+			approvals[i] = SafeHTS.safeIsApprovedForAll(_token[i], _owner[i], _spender[i]);
+		}
+	}
+
 	receive() external payable {
         emit TestEvent(
             msg.sender,

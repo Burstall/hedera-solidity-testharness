@@ -84,7 +84,7 @@ describe('Deployment: ', function() {
 
 		// import ABI
 		abi = json.abi;
-		iface = new ethers.utils.Interface(abi);
+		iface = ethers.Interface.from(abi);
 
 		const contractBytecode = json.bytecode;
 
